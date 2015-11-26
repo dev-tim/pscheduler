@@ -16,8 +16,8 @@
 package db.migration
 
 import pl.touk.pscheduler.slick.migration.CreatingTasksTableMigration
-import slick.driver.{JdbcDriver, PostgresDriver}
+import slick.driver.{HsqldbDriver, JdbcDriver}
 
 class V1_001__CreateTasksTable extends CreatingTasksTableMigration {
-  override protected val driver: JdbcDriver = PostgresDriver
+  override protected val driver: JdbcDriver = HsqldbDriver
 }
