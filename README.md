@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/TouK/pscheduler.svg)](https://travis-ci.org/TouK/pscheduler)
 
 *pscheduler* is a simple, lightweight, persistent scheduler. It's abstracting from in-memory scheduler which will be used for check that some task should be run and from persistence backend.
-Currently there are implemented *Akka* in memory scheduler and *Slick* jdbc persistence in separate modules.
+Currently there are implemented *Akka* in-memory scheduler and *Slick* jdbc persistence in separate modules.
 
 ## QuickStart
 
