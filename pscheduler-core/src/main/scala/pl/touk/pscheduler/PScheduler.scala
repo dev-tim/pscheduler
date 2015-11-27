@@ -20,6 +20,7 @@ import java.time._
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class PScheduler(persistence: TasksPersistence,
                  checkScheduler: InMemoryScheduler,
@@ -74,9 +75,19 @@ class PScheduler(persistence: TasksPersistence,
   private def runTaskThanUpdateLastRun(now: Instant, task: TaskConfiguration)
                                       (implicit ec: ExecutionContext): Future[Unit] = {
     logger.debug(s"Running task: ${task.taskName}")
+    val taskRunF = task.run()
+    taskRunF.onFailure {
+      case NonFatal(ex) => logger.error("Error while running task", ex)
+    }
     for {
-      _ <- task.run()
-      _ <- persistence.save(Task(task.taskName, now))
+      _ <- taskRunF
+      _ <- {
+        val saveF = persistence.save(Task(task.taskName, now))
+        saveF.onFailure {
+          case NonFatal(ex) => logger.error("Error while saving task", ex)
+        }
+        saveF
+      }
     } yield ()
   }
 
