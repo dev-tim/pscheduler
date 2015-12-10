@@ -10,9 +10,9 @@ env:
   - CODACY_PROJECT_TOKEN=b03178a4fae44ee694a25903eda87ff2
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test
+  - sbt clean coverage test
 
 after_success:
-  - sbt coveralls
   - sbt coverageReport
+  - sbt coverageAggregate
   - sbt codacyCoverage
