@@ -19,6 +19,7 @@ import java.time._
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.prop.PropertyChecks
+import org.scalatest.time.{Seconds, Millis, Span}
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,8 +27,13 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 
 class PSchedulerSpec extends FlatSpec with Matchers with OptionValues with ScalaFutures with PropertyChecks {
 
+  override implicit def patienceConfig = PatienceConfig(
+    timeout = scaled(Span(5, Seconds)),
+    interval = scaled(Span(50, Millis))
+  )
+
   it should "run task if wasn't run before" in {
-    var ran = false
+    @volatile var ran = false
     val persistence = new MockTaskPersistence(List.empty)
     val taskName = "foo"
     val scheduler = new PScheduler(
@@ -57,7 +63,7 @@ class PSchedulerSpec extends FlatSpec with Matchers with OptionValues with Scala
 
   it should "not run daily task if was started in the same day" in {
     forAll(table) { (optionalLastRun, givenNow, schedule, shouldRun) =>
-      var ran = false
+      @volatile var ran = false
       val taskName = "foo"
       val persistence = new MockTaskPersistence(optionalLastRun.map(lastRun => Task(taskName, lastRun.toInstant)).toSeq)
       val scheduler = new PScheduler(
